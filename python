@@ -1,0 +1,32 @@
+import numpy as np
+import pandas as pd
+import civisanalytics.api as civis
+import matplotlib.pyplot as plt
+from patsy import dmatrices
+from sklearn.linear_model import LogisticRegression
+from sklearn.cross_validation import train_test_split
+from sklearn import metrics
+from sklearn.cross_validation import cross_val_score
+
+# load dataset
+dta = sm.datasets.fair.load_pandas().data
+
+# add "customer" column: 1 represents is customer, 0 represents not
+dta['customer'] = (dta.customer > 0).astype(int)
+
+# create dataframes with an intercept column and dummy variables for
+# occupation 
+y, X = dmatrices('customer ~ x + y + z + a + \
+                  b + c + C(e) + C(f)',
+                  dta, return_type="dataframe")
+print X.columns
+
+# flatten y into a 1-D array
+y = np.ravel(y)
+
+# instantiate a logistic regression model, and fit with X and y
+model = LogisticRegression()
+model = model.fit(X, y)
+
+# check the accuracy on the training set
+model.score(X, y)
